@@ -87,7 +87,7 @@ The project is developed mostly on Macs, using both BigSur and Monterrey. Less o
 
 ## The _dd_ Branch
 
-Another goal we have for this project is to understand how such a heterogeneous code can benefit from the awesome monitoring capabilities offered by the [Datadog](https://www.datadoghq.com/) platform. If this is not of interest, just don't ever look at the `dd` branch.
+Another goal we have for this project is to understand how such a heterogeneous code can benefit from the awesome monitoring capabilities offered by the [Datadog](https://www.datadoghq.com/) platform. If this is not of interest, just don't ever look at the [dd](https://github.com/m-paternostro/lappdog/tree/dd) branch.
 
 Conversely, if it does spark your curiosity, that branch has all the changes (and only the changes) we made to send profiling, tracing, session, and other information to the Datadog platform.
 
