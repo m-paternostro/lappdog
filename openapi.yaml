@@ -1,0 +1,366 @@
+openapi: 3.0.3
+info:
+  title: LappDog API
+  version: 0.9.0
+  description: The API that must be exposed by a LappDog.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  contact:
+    name: Marcelo Paternostro
+    email: mpaternostro@gmail.com
+tags:
+  - name: calculator
+    description: Operations related to the calculator section.
+  - name: fibonacci
+    description: Operations related to the fibonacci section.
+  - name: ledger
+    description: Operations related to the ledger section.
+  - name: prankster
+    description: Operations related to the prankster section.
+paths:
+  /:
+    get:
+      operationId: getImplementation
+      summary: Returns the information about the implementation of the LappDog API.
+      description: The returned information is used to distinguish different implementations of the LappDog API, and should not change as the API is used.
+      responses:
+        200:
+          description: The information about the implementation of the LappDog API.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Implementation'
+  /calculator:
+    post:
+      operationId: calculate
+      summary: Performs simple operations on numbers.
+      description: This operation can be invoked either with query parameters or body. If using the former, all document parameters are required. Also, if the parameters and the body are provided, the latter takes precedence.
+      tags:
+        - calculator
+      parameters:
+        - name: number1
+          in: query
+          schema:
+            type: number
+        - name: number2
+          in: query
+          schema:
+            type: number
+        - name: operator
+          in: query
+          schema:
+            type: string
+            enum:
+              - multiply
+              - divide
+      requestBody:
+        description: 'As an alternative to the parameters, a body can be used to specify the numbers and operators. The body takes precedence if the body and parameters are both provided.'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculatorInput'
+      responses:
+        200:
+          description: The result of a successful operation.
+          content:
+            text/plain:
+              schema:
+                type: number
+        500:
+          $ref: '#/components/responses/ErrorResponse'
+  /fibonacci:
+    post:
+      operationId: computeLastElement
+      summary: Computes the last element of a Fibonacci sequence of an arbitrary size using different techniques.
+      tags:
+        - fibonacci
+      parameters:
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: The computation results and details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FibonacciResponse'
+        500:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /ledger:
+    get:
+      operationId: getLedgerSummary
+      summary: Returns a summary of the current state of the ledger.
+      tags:
+        - ledger
+      responses:
+        200:
+          description: The summary of the current state of the ledger.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LedgerSummary'
+  /ledger/users:
+    get:
+      operationId: getLedgerUsers
+      summary: Returns the list of users and their balances.
+      tags:
+        - ledger
+      responses:
+        200:
+          description: The list of users and their balances.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LedgerUsers'
+    post:
+      operationId: registerLedgerUser
+      summary: Registers a user by specifying a name and balances.
+      tags:
+        - ledger
+      requestBody:
+        description: The user.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LedgerUser'
+      responses:
+        201:
+          description: The user was successfully registered.
+        500:
+          $ref: '#/components/responses/ErrorResponse'
+  /ledger/transactions:
+    get:
+      operationId: getLedgerTransactions
+      summary: Returns the list of transactions recorded on the ledger, on the order they were recorded.
+      tags:
+        - ledger
+      responses:
+        200:
+          description: The list of transactions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LedgerTransactions'
+    post:
+      operationId: recordLedgerTransaction
+      summary: Records a transaction on the ledger.
+      tags:
+        - ledger
+      requestBody:
+        description: The transaction.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LedgerTransaction'
+      responses:
+        201:
+          description: The transaction was successfully recorded.
+        500:
+          $ref: '#/components/responses/ErrorResponse'
+  /prankster:
+    post:
+      operationId: prankIt
+      summary: Allows clients to force different loads and errors to happen.
+      tags:
+        - prankster
+      requestBody:
+        description: The input for the load and error.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PranksterInput'
+      responses:
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+components:
+  responses:
+    ErrorResponse:
+      description: The description of why it was not possible to perform the operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Implementation:
+      type: object
+      properties:
+        id:
+          description: A short, unique, code-friendly identifier of the implementation.
+          type: string
+        name:
+          type: string
+        image:
+          description: The URI for the image that represents the implementation.
+          type: string
+          format: uri
+        color:
+          description: The RGB color (like '173, 187, 122' for example).
+          type: string
+      required:
+        - name
+        - label
+    CalculatorInput:
+      type: object
+      properties:
+        number1:
+          type: number
+        number2:
+          type: number
+        operator:
+          type: string
+          enum:
+            - multiply
+            - divide
+      required:
+        - number1
+        - number2
+        - operator
+    FibonacciResponse:
+          description: Describes the result and details of different approaches to compute the Fibonacci sequence.
+          type: object
+          properties:
+            size:
+              description: The size of the Fibonacci sequence.
+              type: integer
+              minimum: 1
+            basic:
+              $ref: '#/components/schemas/FibonacciResponse'
+            recursive:
+              $ref: '#/components/schemas/FibonacciResponse'
+            memoized:
+              $ref: '#/components/schemas/FibonacciResponse'
+          required:
+            - size
+            - basic
+            - recursive
+            - memoized
+    FibonacciResult:
+      oneOf:
+        - type: object
+          properties:
+            first:
+              description: The first element of the Fibonacci sequence.
+              type: integer
+            last:
+              description: The last element of the Fibonacci sequence.
+              type: integer
+              format: int64
+            duration:
+              description: How long it took to compute the last element in nanoseconds.
+              type: integer
+              format: int64
+          required:
+            - first
+            - last
+            - duration
+        - type: object
+          properties:
+            message:
+              description: The reason why it was not possible to compute the Fibonacci sequence. This is different from runtime errors, which are reported using the 'Error' schema.
+              type: string
+          required:
+            - message
+    LedgerSummary:
+      type: object
+      properties:
+        users:
+          description: The number of users on the ledger.
+          type: integer
+          minimum: 0
+        transactions:
+          description: The number of transactions recorded on the ledger.
+          type: integer
+          minimum: 0
+        balance:
+          description: The total amount held by all users on the ledger.
+          type: number
+          minimum: 0
+      required:
+        - users
+        - transactions
+        - balance
+    LedgerUser:
+      type: object
+      properties:
+        name:
+          description: A unique name that identifies a user.
+          type: string
+          minLength: 3
+        balance:
+          description: The amount held by the user.
+          type: number
+          minimum: 0
+      required:
+        - name
+        - balance
+    LedgerUsers:
+      type: array
+      items:
+        $ref: '#/components/schemas/LedgerUser'
+    LedgerTransaction:
+      type: object
+      properties:
+        from:
+          type: string
+          description: The name of the user that is transferring the amount.
+          minLength: 3
+        to:
+          type: string
+          description: The name of the user that is receiving the amount.
+          minLength: 3
+        amount:
+          type: number
+          minimum: 0
+      required:
+        - from
+        - to
+        - amount
+    LedgerTransactions:
+      type: array
+      items:
+        $ref: '#/components/schemas/LedgerTransaction'
+    PranksterInput:
+      allOf:
+        - oneOf:
+          - type: object
+            properties:
+              exceptionMessage:
+                type: string
+                description: If provided, the implementation produces (throws) an error with this message.
+            required:
+              - exceptionMessage
+          - type: object
+            properties:
+              statusCode:
+                type: integer
+                description: The status code to be returned for prankster the request, if there is no exception message.
+                minimum: 100
+                maximum: 599
+            required:
+              - statusCode
+        - anyOf:
+          - type: object
+            properties:
+              delay:
+                type: integer
+                description: The number of milliseconds to wait before yielding the response.
+                minimum: 0
+          - type: object
+            description: An empty object
+            additionalProperties: false
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        stack:
+          type: array
+          items:
+            type: string
+      required:
+        - message

@@ -1,0 +1,196 @@
+version: '3.9'
+services:
+
+  db:
+    build:
+      context: ./db
+      dockerfile: Containerfile
+      target: production
+      args:
+        port: $LAPPDOG_DB_PORT
+    image: lappdog_image_db
+    container_name: $LAPPDOG_DB_HOST
+    ports:
+      - "$LAPPDOG_LOCAL_DB_PORT:$LAPPDOG_DB_PORT"
+    volumes:
+      - type: volume
+        source: lappdog-db-data
+        target: /var/lib/mysql
+        volume:
+          nocopy: true
+    env_file:
+      - .env/common.env
+      - .env/db.common.env
+      - .env/db.env
+      - .env/container.env
+    stop_grace_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    command: [$LAPPDOG_DB_PORT]
+
+  viewer:
+    build:
+      context: ./viewer
+      dockerfile: Containerfile
+      target: production
+      args:
+        port: $LAPPDOG_VIEWER_PORT
+    image: lappdog_image_viewer
+    container_name: $LAPPDOG_VIEWER_HOST
+    ports:
+      - "$LAPPDOG_LOCAL_VIEWER_PORT:$LAPPDOG_VIEWER_PORT"
+    env_file:
+      - .env/common.env
+      - .env/container.env
+    environment:
+      - LAPPDOG_URL=http://$LAPPDOG_LOCAL_NODE_HOST:$LAPPDOG_LOCAL_NODE_PORT
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    command: [$LAPPDOG_VIEWER_PORT]
+
+  devviewer:
+    profiles: [dev]
+    build:
+      context: ./viewer
+      dockerfile: Containerfile
+      target: jsdevelopment
+      args:
+        port: 54202
+    image: lappdog_image_dev_viewer
+    container_name: lappdog_dev_viewer
+    ports:
+      - "$LAPPDOG_DEV_VIEWER_PORT:54202"
+    volumes:
+      - type: bind
+        source: ./viewer
+        target: /work/app
+    env_file:
+      - .env/common.env
+      - .env/container.env
+    stop_grace_period: 30s
+    tty: true
+
+  devviewergo:
+    profiles: [dev]
+    build:
+      context: ./viewer
+      dockerfile: Containerfile
+      target: godevelopment
+      args:
+        port: 54252
+    image: lappdog_image_dev_viewer_go
+    container_name: lappdog_dev_viewer_go
+    ports:
+      - "$LAPPDOG_DEV_VIEWER_GO_PORT:54252"
+    volumes:
+      - type: bind
+        source: ./viewer/src.go
+        target: /work/app/src
+      - type: bind
+        source: ./viewer/bin
+        target: /work/build
+    env_file:
+      - .env/common.env
+      - .env/container.env
+    stop_grace_period: 30s
+    tty: true
+
+  node:
+    build:
+      context: ./node
+      dockerfile: Containerfile
+      target: production
+      args:
+        port: $LAPPDOG_NODE_PORT
+    image: lappdog_image_node
+    container_name: $LAPPDOG_NODE_HOST
+    ports:
+      - "$LAPPDOG_LOCAL_NODE_PORT:$LAPPDOG_NODE_PORT"
+    env_file:
+      - .env/common.env
+      - .env/db.common.env
+      - .env/container.env
+    stop_grace_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    command: [$LAPPDOG_NODE_PORT]
+
+  devnode:
+    profiles: [dev]
+    build:
+      context: ./node
+      dockerfile: Containerfile
+      target: development
+      args:
+        port: 54203
+    image: lappdog_image_dev_node
+    container_name: lappdog_dev_node
+    ports:
+      - "$LAPPDOG_DEV_NODE_PORT:54203"
+    volumes:
+      - type: bind
+        source: ./node
+        target: /work/app
+    env_file:
+      - .env/common.env
+      - .env/db.common.env
+      - .env/container.env
+    stop_grace_period: 30s
+    tty: true
+
+  go:
+    build:
+      context: ./go
+      dockerfile: Containerfile
+      target: production
+      args:
+        port: $LAPPDOG_GO_PORT
+    image: lappdog_image_go
+    container_name: $LAPPDOG_GO_HOST
+    ports:
+      - "$LAPPDOG_LOCAL_GO_PORT:$LAPPDOG_GO_PORT"
+    env_file:
+      - .env/common.env
+      - .env/db.common.env
+      - .env/container.env
+    stop_grace_period: 30s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    command: [$LAPPDOG_GO_PORT]
+
+  devgo:
+    profiles: [dev]
+    build:
+      context: ./go
+      dockerfile: Containerfile
+      target: development
+      args:
+        port: 54204
+    image: lappdog_image_dev_go
+    container_name: lappdog_dev_go
+    ports:
+      - "$LAPPDOG_DEV_GO_PORT:54204"
+    volumes:
+      - type: bind
+        source: ./go/src
+        target: /work/app/src
+      - type: bind
+        source: ./go/bin
+        target: /work/build
+    env_file:
+      - .env/common.env
+      - .env/db.common.env
+      - .env/container.env
+    stop_grace_period: 30s
+    tty: true
+
+volumes:
+  lappdog-db-data:

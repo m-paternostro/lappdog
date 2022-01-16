@@ -1,0 +1,79 @@
+@baseURI = http://localhost:43203
+
+POST {{baseURI}}/calculator HTTP/1.1
+Content-Type: application/json
+Access-Control-Request-Method: POST
+
+{
+  "number1": 10,
+  "number2": 5,
+  "operator": "multiply"
+}
+
+###
+
+POST {{baseURI}}/calculator HTTP/1.1
+Content-Type: application/json
+
+{
+  "number1": 10,
+  "number2": 5,
+  "operator": "divide"
+}
+
+###
+
+POST {{baseURI}}/calculator?number1=3&number2=4&operator=multiply HTTP/1.1
+
+###
+
+// Invalid operator
+POST {{baseURI}}/calculator HTTP/1.1
+Content-Type: application/json
+
+{
+  "number1": 10,
+  "number2": 5,
+  "operator": "something-else"
+}
+
+###
+
+// Invalid number1
+POST {{baseURI}}/calculator HTTP/1.1
+Content-Type: application/json
+
+{
+  "number1": "a10",
+  "number2": 5,
+  "operator": "multiply"
+}
+
+###
+
+// Invalid number2
+POST {{baseURI}}/calculator HTTP/1.1
+Content-Type: application/json
+
+{
+  "number1": 10,
+  "number2": "b5",
+  "operator": "multiply"
+}
+
+###
+
+// Division by 0
+POST {{baseURI}}/calculator HTTP/1.1
+Content-Type: application/json
+
+{
+  "number1": 10,
+  "number2": 0,
+  "operator": "divide"
+}
+
+###
+
+// Missing input
+POST {{baseURI}}/calculator?number1=3 HTTP/1.1

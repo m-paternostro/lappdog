@@ -1,0 +1,159 @@
+FROM node:16 as jsdependencies
+
+ARG uid=1000
+ARG gid=1000
+
+RUN usermod --uid ${uid} node \
+    && groupmod --gid ${gid} node \
+    && mkdir -p /work/app/src /work/node_modules /work/scripts \
+    && chown -R node:node /work
+
+VOLUME /work/app/node_modules
+ENV NODE_ENV=development
+
+WORKDIR /work/scripts
+USER node
+RUN echo "alias ll='ls -la'" >> ~/.bashrc \
+    && echo 'cd /work && npm install "$@"' > install \
+    && echo 'cd /work && npm update "$@"' > update \
+    && chmod 755 *
+
+WORKDIR /work
+COPY --chown=node package.json package-lock.json ./
+RUN npm install
+
+WORKDIR /work/app
+
+# ====
+
+FROM jsdependencies as jsdevelopment
+
+WORKDIR /work
+RUN rm package.json package-lock.json \
+    && ln -s ./app/package.json package.json \
+    && ln -s ./app/package-lock.json package-lock.json
+
+WORKDIR /work/app
+
+ENTRYPOINT ["bash"]
+ARG port=53202
+EXPOSE ${port}
+
+# execlabels
+LABEL dev.build="npm run build-dev"
+LABEL dev.install="bash /work/scripts/install"
+LABEL dev.lint="npm run lint"
+LABEL dev.run "npm run dev -- --port ${port}"
+LABEL dev.update "bash /work/scripts/update"
+
+# ====
+
+FROM node:16 AS jsbuild
+
+ARG uid=1000
+ARG gid=1000
+
+RUN usermod --uid ${uid} node \
+    && groupmod --gid ${gid} node
+
+ENV NODE_ENV=production
+
+WORKDIR /work/app
+COPY package.json package-lock.json ./
+RUN npm ci --only=production
+
+COPY *.js .
+COPY /resources resources
+COPY /src src
+RUN npm run build-prod
+
+# ====
+# ====
+
+FROM golang:1.14 AS godependencies
+
+ARG udi=1000
+ARG gid=1000
+
+RUN mkdir -p /work/app/src /work/dependencies /work/out /work/home /work/scripts \
+    && addgroup --gid "${gid}" worker \
+    && adduser \
+      --disabled-password \
+      --gecos "" \
+      --home "/work/home" \
+      --shell "/sbin/nologin" \
+      --no-create-home \
+      --uid "${udi}" \
+      --gid "${gid}" \
+      "worker" \
+    && chown -R worker:worker /work
+
+ENV GOPATH=/work/dependencies
+ENV GOBIN=/work/out
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+
+WORKDIR /work/app/src
+
+COPY --chown=worker /src.go/go.* .
+
+USER worker
+RUN go mod download
+
+# ====
+
+FROM golangci/golangci-lint:v1.43 AS golinter
+
+# ====
+
+FROM godependencies AS godevelopment
+
+COPY --from=golinter /usr/bin/golangci-lint /usr/bin/golangci-lint
+
+WORKDIR /work/scripts
+USER worker
+RUN echo "alias ll='ls -la'\nPATH=/work/scripts:\$PATH" >> /work/home/.bashrc \
+    && echo 'go mod tidy' > tidy \
+    && echo 'golangci-lint run --timeout 10m0s ./...' > lint \
+    && echo 'go run main.go "$@"' > run \
+    && echo 'GOOS="$1" go build -installsuffix cgo -o /work/build/server' > build \
+    && chmod 755 *
+
+WORKDIR /work/app/src
+
+ENTRYPOINT ["bash"]
+ARG port=53252
+EXPOSE ${port}
+
+# execlabels
+LABEL dev.build="bash /work/scripts/build"
+LABEL dev.lint="bash /work/scripts/lint"
+LABEL dev.run "bash /work/scripts/run ${port}"
+LABEL dev.tidy "bash /work/scripts/tidy"
+
+# ====
+
+FROM godependencies AS gobuild
+
+WORKDIR /work/app/src
+COPY --chown=worker /src.go .
+
+USER worker
+RUN go build -a -installsuffix cgo -o /work/out/server .
+
+# ====
+# ====
+
+FROM scratch AS production
+
+ENTRYPOINT ["/server", "/html"]
+ARG port=53002
+EXPOSE ${port}
+CMD ["53002"]
+
+COPY --from=gobuild /work/out/server /
+COPY --from=jsbuild /etc/passwd /etc/passwd
+COPY --from=jsbuild /etc/group /etc/group
+COPY --from=jsbuild /work/app/dist /html
+
+USER node

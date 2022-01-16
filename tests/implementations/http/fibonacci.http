@@ -1,0 +1,23 @@
+@baseURI = http://localhost:43203
+
+POST {{baseURI}}/fibonacci?size=0 HTTP/1.1
+
+###
+
+POST {{baseURI}}/fibonacci?size=1 HTTP/1.1
+
+###
+
+POST {{baseURI}}/fibonacci?size=2 HTTP/1.1
+
+###
+
+POST {{baseURI}}/fibonacci?size=9 HTTP/1.1
+
+###
+
+POST {{baseURI}}/fibonacci?size=13 HTTP/1.1
+
+###
+
+POST {{baseURI}}/fibonacci?size=50 HTTP/1.1

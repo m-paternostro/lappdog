@@ -1,0 +1,102 @@
+@baseURI = http://localhost:43203
+
+GET {{baseURI}}/ledger HTTP/1.1
+
+###
+
+GET {{baseURI}}/ledger/users HTTP/1.1
+
+###
+
+POST {{baseURI}}/ledger/users HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Peter Parker",
+  "balance": 10
+}
+
+###
+
+POST {{baseURI}}/ledger/users HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Steve Rogers",
+  "balance": 20
+}
+
+
+###
+
+// Negative balance
+POST {{baseURI}}/ledger/users HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Luke Cage",
+  "balance": -20
+}
+
+###
+
+GET {{baseURI}}/ledger/transactions HTTP/1.1
+
+###
+
+POST {{baseURI}}/ledger/transactions HTTP/1.1
+Content-Type: application/json
+
+{
+  "from": "Peter Parker",
+  "to": "Steve Rogers",
+  "amount": 5
+}
+
+###
+
+// Unknown from
+POST {{baseURI}}/ledger/transactions HTTP/1.1
+Content-Type: application/json
+
+{
+  "from": "Who",
+  "to": "Steve Rogers",
+  "amount": 5
+}
+
+###
+
+// Unknown to
+POST {{baseURI}}/ledger/transactions HTTP/1.1
+Content-Type: application/json
+
+{
+  "from": "Peter Parker",
+  "to": "Who",
+  "amount": 5
+}
+
+###
+
+// Negative amount
+POST {{baseURI}}/ledger/transactions HTTP/1.1
+Content-Type: application/json
+
+{
+  "from": "Peter Parker",
+  "to": "Steve Rogers",
+  "amount": -5
+}
+
+###
+
+// Amount too big
+POST {{baseURI}}/ledger/transactions HTTP/1.1
+Content-Type: application/json
+
+{
+  "from": "Peter Parker",
+  "to": "Steve Rogers",
+  "amount": 5000
+}

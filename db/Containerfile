@@ -1,0 +1,8 @@
+FROM mysql:8.0 AS production
+
+ENTRYPOINT [ "docker-entrypoint.sh", "--port" ]
+ARG port=53001
+EXPOSE ${port}
+CMD ["53001"]
+
+COPY /init /docker-entrypoint-initdb.d

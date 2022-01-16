@@ -1,0 +1,8 @@
+@baseURI = http://localhost:43203
+
+GET {{baseURI}}/ HTTP/1.1
+
+###
+
+// 404
+GET {{baseURI}}/nope HTTP/1.1

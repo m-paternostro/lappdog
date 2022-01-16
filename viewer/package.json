@@ -1,0 +1,27 @@
+{
+  "name": "lappdog-viewer",
+  "version": "0.9.0",
+  "description": "Viewer for LappDogs.",
+  "keywords": [],
+  "author": "Marcelo Paternostro <mpaternostro@gmail.com>",
+  "license" : "MIT",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "lint": "eslint *.js src/**",
+    "dev": "webpack serve --config webpack.development.js",
+    "build-dev": "webpack build --config webpack.development.js",
+    "build-prod": "webpack build --config webpack.production.js"
+  },
+  "dependencies": {
+    "css-loader": "^6.5.1",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "html-webpack-plugin": "^5.5.0",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.7.1",
+    "webpack-merge": "^5.8.0"
+  }
+}

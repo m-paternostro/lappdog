@@ -1,0 +1,70 @@
+FROM node:16 as dependencies
+
+ARG uid=1000
+ARG gid=1000
+
+RUN usermod --uid ${uid} node \
+    && groupmod --gid ${gid} node \
+    && mkdir -p /work/app/src /work/node_modules /work/scripts \
+    && chown -R node:node /work
+
+VOLUME /work/app/node_modules
+ENV NODE_ENV=development
+
+WORKDIR /work/scripts
+USER node
+RUN echo "alias ll='ls -la'" >> ~/.bashrc \
+    && echo 'cd /work && npm install "$@"' > install \
+    && echo 'cd /work && npm update "$@"' > update \
+    && chmod 755 *
+
+WORKDIR /work
+COPY --chown=node package.json package-lock.json ./
+RUN npm install
+
+WORKDIR /work/app
+
+# ====
+
+FROM dependencies as development
+
+WORKDIR /work
+RUN rm package.json package-lock.json \
+    && ln -s ./app/package.json package.json \
+    && ln -s ./app/package-lock.json package-lock.json
+
+WORKDIR /work/app
+
+ENTRYPOINT ["bash"]
+ARG port=53203
+EXPOSE ${port}
+
+# execlabels
+LABEL dev.install="bash /work/scripts/install"
+LABEL dev.lint="npm run lint"
+LABEL dev.run "npm run dev ${port}"
+LABEL dev.update "bash /work/scripts/update"
+
+# ====
+
+FROM node:16-slim as production
+
+ARG udi=1000
+ARG gid=1000
+ENV NODE_ENV=production
+
+RUN usermod --uid ${udi} node \
+    && groupmod --gid ${gid} node
+
+ENTRYPOINT ["node", "src/server.js"]
+ARG port=53003
+EXPOSE ${port}
+CMD ["53003"]
+
+WORKDIR /work/app
+COPY package.json package-lock.json ./
+RUN npm ci --only=production \
+    && npm cache clean --force
+COPY . .
+
+USER node

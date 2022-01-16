@@ -1,0 +1,337 @@
+/*
+ * Inspired by:
+ *   https://24ways.org/2009/have-a-field-day-with-html5-forms
+ *   https://www.w3schools.com/howto/howto_js_collapsible.asp
+ */
+
+html, body, h1, form, fieldset, legend, ol, li {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  --lappdogColor: 152, 106, 163;
+  --lappdogColorLevel1: 0.4;
+  --lappdogColorLevel2: 0.2;
+
+  background: #ffffff;
+  color: #111111;
+  padding: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    --lappdogColorLevel1: 0.9;
+    --lappdogColorLevel2: 0.8;
+
+    background-color: #222020;
+    color: #2e2b2b;
+    padding: 10px;
+  }
+}
+
+.menubar {
+  overflow: hidden;
+  background-color: #333;
+  position: relative;
+  min-width: 350px;
+}
+
+.menubar #items {
+  display: none;
+}
+
+.menubar .title {
+  background-color: #3b063b;
+  color: white;
+  width: 100%;
+}
+
+.menubar a {
+  color: white;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  display: block;
+}
+
+.menubar a.disabled {
+  color: rgb(122, 117, 117);
+}
+
+.menubar a.icon {
+  background: black;
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.menubar a:not(.title):hover {
+  background-color: #ddd;
+  color: black;
+  cursor: default;
+}
+
+div.lappdogs {
+  height: auto;
+  display: grid;
+  grid-gap: 5px 8px;
+  grid-template-columns: repeat(auto-fit, 350px);
+  grid-template-rows: repeat(auto-fit, auto);
+}
+
+div.lappdogs div.lappdog {
+  background: none;
+  padding-top: 10px;
+  width: 350px;
+  height: auto;
+  overflow: hidden;
+}
+
+div.lappdog div.header {
+  background-color: rgba(var(--lappdogColor), 1);
+  padding: 0px 20px;
+  margin-top: 0px;
+  margin-bottom: 5px;
+}
+
+div.header div {
+  float: right;
+}
+
+div.header img {
+  height: 80px;
+  width: 80px;
+}
+
+div.header h1 {
+  margin: 0px;
+  margin-top: 20px;
+  font-size: 20px;
+  text-align: right;
+}
+
+div.header h2 {
+  margin: 0px;
+  font-style: italic;
+  font-weight: lighter;
+  font-size: 13px;
+  text-align: right;
+}
+
+div.lappdog .collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+div.lappdog .active, .collapsible:hover {
+  background-color: #555;
+}
+
+div.lappdog .content {
+  margin-top: 0px;
+  overflow: hidden;
+}
+
+div.lappdog div.section {
+  background: none;
+  padding: 0px 0px;
+  margin-bottom: 5px;
+}
+
+div.section form {
+  background: rgba(var(--lappdogColor), var(--lappdogColorLevel1));
+  padding: 20px;
+  margin-bottom: 3px;
+}
+
+div.section form:last-of-type {
+  margin-bottom: 0px;
+}
+
+div.section fieldset {
+  border: none;
+  margin-bottom: 10px;
+}
+
+div.section fieldset:last-of-type {
+  margin-bottom: 0;
+}
+
+div.section legend {
+  color: #384313;
+  font-size: 16px;
+  font-weight: bold;
+  padding-bottom: 10px;
+  text-shadow: 0 1px 1px #f1f1f1;
+}
+
+div.section fieldset fieldset legend {
+  color: #111111;
+  font-size: 13px;
+  font-weight: normal;
+  padding-bottom: 0;
+}
+
+div.section ol li {
+  background: rgba(var(--lappdogColor), var(--lappdogColorLevel2));
+  border-color: rgba(var(--lappdogColor), var(--lappdogColorLevel1));
+  border-style: solid;
+  border-width: 2px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  line-height: 30px;
+  list-style: none;
+  padding: 5px 10px;
+  margin-bottom: 2px;
+}
+
+div.section ol ol li {
+  background: none;
+  border: none;
+  float: left;
+}
+
+div.section label {
+  float: left;
+  font-size: 13px;
+  width: 20%;
+}
+
+div.section fieldset fieldset label {
+  background:none no-repeat left 50%;
+  line-height: 20px;
+  padding: 0 0 0 30px;
+  width: auto;
+}
+
+div.section fieldset fieldset label:hover {
+  cursor: pointer;
+}
+
+div.section input:not([type=radio]),
+
+div.section input {
+  background: #ffffff;
+  border: none;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+  font-size: 13px;
+  outline: none;
+  padding: 5px;
+  width: 75%;
+}
+
+div.section .row-input {
+  background: #ffffff;
+  border: none;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -khtml-border-radius: 3px;
+  border-radius: 3px;
+  font-size: 13px;
+  outline: none;
+  padding: 5px;
+  width: 100%;
+
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+div.section input:not([type=submit]):focus,
+
+div.section textarea:not([readonly]):focus {
+  background: #f0ebeb;
+}
+
+div.section input:read-only:focus {
+  background: #8b8b8b;
+}
+
+div.section textarea[read-only]:focus {
+  background: #8b8b8b;
+}
+
+div.section input[type=radio] {
+  float: left;
+  margin-right: 5px;
+}
+
+div.section button {
+  background: #384313;
+  float: right;
+  border: none;
+  color: #ffffff;
+  display: block;
+  letter-spacing: 1px;
+  padding: 5px 5px;
+  text-shadow: 0 1px 1px #000000;
+}
+
+div.section button.action {
+  background: #384313;
+  float: left;
+  border: none;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -khtml-border-radius: 20px;
+  border-radius: 20px;
+  color: #ffffff;
+  display: block;
+  font: 12px Georgia, "Times New Roman", Times, serif;
+  letter-spacing: 1px;
+  margin: 5px 3px;
+  padding: 7px 25px;
+  text-shadow: 0 1px 1px #000000;
+}
+
+div.section button:disabled {
+  background: #8b8b8b;
+  color: #cfc9c9;
+}
+
+div.section button:hover {
+  background: #1e2506;
+  cursor: pointer;
+}
+
+div.section .counter-badge {
+  background-color: #539c45;
+  border-radius: 2px;
+  color: white;
+  padding: 1px 3px;
+  font-size: 10px;
+  float: right;
+  text-align: right;
+  margin-top: 12px;
+}
+
+div.section .error-badge {
+  background-color: #9c3535;
+  border-radius: 2px;
+  color: white;
+  padding: 1px 3px;
+  font-size: 10px;
+  float: right;
+  text-align: right;
+  margin-top: 12px;
+  margin-left: 3px;
+}
+
+div.section input.strikedout {
+  text-decoration-color: rgb(172, 8, 8);
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}

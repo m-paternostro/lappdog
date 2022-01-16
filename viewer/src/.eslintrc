@@ -1,0 +1,6 @@
+{
+  "extends": "../.eslint.base.json",
+  "env": {
+    "browser": true
+  }
+}

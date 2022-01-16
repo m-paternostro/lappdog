@@ -1,0 +1,85 @@
+FROM golang:1.14 AS dependencies
+
+ARG uid=1000
+ARG gid=1000
+
+RUN mkdir -p /work/app/src /work/dependencies /work/out /work/home /work/scripts \
+    && addgroup --gid "${gid}" worker \
+    && adduser \
+      --disabled-password \
+      --gecos "" \
+      --home "/work/home" \
+      --shell "/sbin/nologin" \
+      --no-create-home \
+      --uid "${uid}" \
+      --gid "${gid}" \
+      "worker" \
+    && chown -R worker:worker /work
+
+ENV GOPATH=/work/dependencies
+ENV GOBIN=/work/out
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+
+WORKDIR /work/app/src
+
+COPY --chown=worker /src/go.* .
+
+USER worker
+RUN go mod download
+
+# ====
+
+FROM golangci/golangci-lint:v1.43 AS linter
+
+# ====
+
+FROM dependencies AS development
+
+COPY --from=linter /usr/bin/golangci-lint /usr/bin/golangci-lint
+
+WORKDIR /work/scripts
+USER worker
+RUN echo "alias ll='ls -la'\nPATH=/work/scripts:\$PATH" >> /work/home/.bashrc \
+    && echo 'go mod tidy' > tidy \
+    && echo 'golangci-lint run --timeout 10m0s ./...' > lint \
+    && echo 'go run main.go "$@"' > run \
+    && echo 'GOOS="$1" go build -installsuffix cgo -o /work/build/server' > build \
+    && chmod 755 *
+
+WORKDIR /work/app/src
+
+ENTRYPOINT ["bash"]
+ARG port=53204
+EXPOSE ${port}
+
+# execlabels
+LABEL dev.build="bash /work/scripts/build"
+LABEL dev.lint="bash /work/scripts/lint"
+LABEL dev.run "bash /work/scripts/run ${port}"
+LABEL dev.tidy "bash /work/scripts/tidy"
+
+# ====
+
+FROM dependencies AS build
+
+WORKDIR /work/app/src
+COPY --chown=worker /src .
+
+USER worker
+RUN go build -a -installsuffix cgo -o /work/out/server .
+
+# ====
+
+FROM scratch AS production
+
+ENTRYPOINT [ "/server" ]
+ARG port=53004
+EXPOSE ${port}
+CMD ["53004"]
+
+COPY --from=build /etc/passwd /etc/passwd
+COPY --from=build /etc/group /etc/group
+COPY --from=build /work/out/server /server
+
+USER worker
