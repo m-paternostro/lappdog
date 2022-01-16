@@ -76,7 +76,7 @@ On the other hand, we will not go after you for using anything you like here - w
 
 ## Requirements
 
-The project is developed mostly on Macs, using both BigSur and Monterrey. Less often than desired, we also use machines running [Arch Linux](https://archlinux.org/).
+The project is developed mostly on Macs, using both Big Sur and Monterey. Less often than desired, we also use machines running [Arch Linux](https://archlinux.org/).
 
 * [Docker](https://www.docker.com/) or [Podman](https://podman.io/).
 * [Docker Compose](https://docs.docker.com/compose/) or [Podman Compose](https://github.com/containers/podman-compose)
