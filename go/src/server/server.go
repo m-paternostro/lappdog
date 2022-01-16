@@ -9,9 +9,15 @@ import (
 )
 
 func Run() {
+  headers, err := DatadogStart()
+  if (err != nil) {
+    log.Fatal(err)
+  }
+  defer DatadogStop()
+
   router := NewRouter()
 
-  headersOk := handlers.AllowedHeaders([]string{"Content-Type"})
+  headersOk := handlers.AllowedHeaders(append(headers, "Content-Type"))
   originsOk := handlers.AllowedOrigins([]string{"*"})
   methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
 

@@ -1,0 +1,14 @@
+FROM gcr.io/datadoghq/agent:latest AS production
+
+ARG lappdogDBHost=S{LAPPDOG_DB_HOST}
+ARG lappdogDBPort=${LAPPDOG_DB_PORT}
+ARG ddDBUser=${DD_DB_USER}
+ARG ddDBPassword=${DD_DB_PASSWORD}
+
+COPY /conf.d /conf.d
+RUN cat /conf.d/mysql.d/conf.yaml.template \
+    | sed "s/_{LAPPDOG_DB_HOST}/${lappdogDBHost}/g" \
+    | sed "s/_{LAPPDOG_DB_PORT}/${lappdogDBPort}/g" \
+    | sed "s/_{DD_DB_USER}/${ddDBUser}/g" \
+    | sed "s/_{DD_DB_PASSWORD}/${ddDBPassword}/g" \
+    > /conf.d/mysql.d/conf.yaml

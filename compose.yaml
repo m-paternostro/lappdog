@@ -1,5 +1,44 @@
 version: '3.9'
 services:
+  datadog:
+    profiles: [datadog]
+    build:
+      context: ./datadog
+      dockerfile: Containerfile
+      target: production
+      args:
+        lappdogDBHost: $LAPPDOG_DB_HOST
+        lappdogDBPort: $LAPPDOG_DB_PORT
+        ddDBUser: $DD_DB_USER
+        ddDBPassword: $DD_DB_PASSWORD
+    image: lappdog_datadog_image
+    container_name: $DD_AGENT_HOST
+    volumes:
+      - /etc/passwd:/etc/passwd:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - /sys/kernel/debug:/sys/kernel/debug
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    env_file:
+      - .env/common.env
+      - .env/datadog.env
+      - .env/datadog.rum.env
+      - .env/container.env
+    cap_add:
+      - SYS_ADMIN
+      - SYS_RESOURCE
+      - SYS_PTRACE
+      - NET_ADMIN
+      - NET_BROADCAST
+      - NET_RAW
+      - IPC_LOCK
+      - CHOWN
+    security_opt:
+      - apparmor:unconfined
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
 
   db:
     build:
@@ -23,6 +62,8 @@ services:
       - .env/db.common.env
       - .env/db.env
       - .env/container.env
+    environment:
+      - DD_SERVICE=$LAPPDOG_SERVICE_DB
     stop_grace_period: 30s
     deploy:
       restart_policy:
@@ -44,8 +85,10 @@ services:
     env_file:
       - .env/common.env
       - .env/container.env
+      - .env/datadog.rum.env
     environment:
       - LAPPDOG_URL=http://$LAPPDOG_LOCAL_NODE_HOST:$LAPPDOG_LOCAL_NODE_PORT
+      - DD_SERVICE=$LAPPDOG_SERVICE_VIEWER
     deploy:
       restart_policy:
         condition: on-failure
@@ -71,6 +114,8 @@ services:
     env_file:
       - .env/common.env
       - .env/container.env
+    environment:
+      - LAPPDOG_DD_DISABLED=true
     stop_grace_period: 30s
     tty: true
 
@@ -96,6 +141,8 @@ services:
     env_file:
       - .env/common.env
       - .env/container.env
+    environment:
+      - LAPPDOG_DD_DISABLED=true
     stop_grace_period: 30s
     tty: true
 
@@ -114,6 +161,8 @@ services:
       - .env/common.env
       - .env/db.common.env
       - .env/container.env
+    environment:
+      - DD_SERVICE=$LAPPDOG_SERVICE_NODE
     stop_grace_period: 30s
     deploy:
       restart_policy:
@@ -141,6 +190,8 @@ services:
       - .env/common.env
       - .env/db.common.env
       - .env/container.env
+    environment:
+      - LAPPDOG_DD_DISABLED=true
     stop_grace_period: 30s
     tty: true
 
@@ -159,6 +210,8 @@ services:
       - .env/common.env
       - .env/db.common.env
       - .env/container.env
+    environment:
+      - DD_SERVICE=$LAPPDOG_SERVICE_GO
     stop_grace_period: 30s
     deploy:
       restart_policy:
@@ -189,6 +242,8 @@ services:
       - .env/common.env
       - .env/db.common.env
       - .env/container.env
+    environment:
+      - LAPPDOG_DD_DISABLED=true
     stop_grace_period: 30s
     tty: true
 

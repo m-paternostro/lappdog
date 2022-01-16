@@ -2,10 +2,13 @@ import { createElement, fetchEnvironmentVariables, performLongOperation } from '
 import createContext from './models/context.js';
 import createLappdogComponent from './components/lappdog.js';
 import createMenubarComponent from './components/menubar.js';
+import startDatadog from './datadog.js';
 
 import '../resources/style.css';
 
 const start = async () => {
+  await performLongOperation(startDatadog);
+
   const body = document.body;
   const context = createContext();
 

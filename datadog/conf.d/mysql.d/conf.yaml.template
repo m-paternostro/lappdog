@@ -1,0 +1,8 @@
+init_config:
+
+instances:
+  - dbm: true
+    host: _{LAPPDOG_DB_HOST}
+    port: _{LAPPDOG_DB_PORT}
+    username: _{DD_DB_USER}
+    password: _{DD_DB_PASSWORD}

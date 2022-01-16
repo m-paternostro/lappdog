@@ -6,5 +6,17 @@ GRANT INSERT, SELECT ON users TO '$LAPPDOG_DB_USER'@'%';
 GRANT INSERT, SELECT ON transactions TO '$LAPPDOG_DB_USER'@'%';
 GRANT EXECUTE ON FUNCTION registerTransaction TO '$LAPPDOG_DB_USER'@'%';
 "
-
 mysql -u root -p$MYSQL_ROOT_PASSWORD -Dledger --execute "$COMMAND"
+
+COMMAND="
+CREATE USER '$DD_DB_USER'@'%' IDENTIFIED WITH mysql_native_password by '$DD_DB_PASSWORD';
+ALTER USER '$DD_DB_USER'@'%' WITH MAX_USER_CONNECTIONS 5;
+GRANT REPLICATION CLIENT ON *.* TO '$DD_DB_USER'@'%';
+GRANT PROCESS ON *.* TO '$DD_DB_USER'@'%';
+GRANT SELECT ON performance_schema.* TO '$DD_DB_USER'@'%';
+GRANT EXECUTE ON datadog.* to '$DD_DB_USER'@'%';
+GRANT CREATE TEMPORARY TABLES ON datadog.* TO '$DD_DB_USER'@'%';
+GRANT EXECUTE ON PROCEDURE datadog.enable_events_statements_consumers TO '$DD_DB_USER'@'%';
+GRANT EXECUTE ON PROCEDURE ledger.explain_statement TO datadog@'%';
+"
+mysql -u root -p$MYSQL_ROOT_PASSWORD --execute "$COMMAND"

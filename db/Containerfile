@@ -5,4 +5,5 @@ ARG port=53001
 EXPOSE ${port}
 CMD ["53001"]
 
+COPY /performance.cnf /etc/mysql/conf.d
 COPY /init /docker-entrypoint-initdb.d

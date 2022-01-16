@@ -14,6 +14,7 @@
     "build-prod": "webpack build --config webpack.production.js"
   },
   "dependencies": {
+    "@datadog/browser-rum": "^4.1.0",
     "css-loader": "^6.5.1",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",

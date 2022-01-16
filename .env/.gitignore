@@ -1,2 +1,5 @@
 db.common.env
 db.env
+
+datadog.env
+datadog.rum.env

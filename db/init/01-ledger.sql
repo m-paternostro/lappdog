@@ -50,3 +50,14 @@ RETURNS BOOLEAN MODIFIES SQL DATA
   END;
 //
 DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE ledger.explain_statement(IN query TEXT)
+    SQL SECURITY DEFINER
+BEGIN
+    SET @explain := CONCAT('EXPLAIN FORMAT=json ', query);
+    PREPARE stmt FROM @explain;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+END $$
+DELIMITER ;

@@ -1,5 +1,36 @@
 # LappDog
 
+## Rebase Warning
+
+***This branch is constantly `REBASED`!*** And probably will never be merged into main.
+
+This [branch](#the-dd-branch) contains all [Datadog](https://www.datadoghq.com/)-related changes made to the "raw" application. These changes allow sending a great amount of information to the Datadog Platform including trace, profile, metrics, and RUM.
+
+This branch is meant to be always a perfect delta of the difference required to benefit from the Datadog offerings. As such, it is constantly `git rebased`, which means that downstream branches will break often.
+
+A few tips:
+
+* The `main` branch is not rebased and follows a normal development process.
+  * All non Datadog-related changes are committed to the `main` branch and then rebased into the `dd` branch.
+  * All Datadog specific changes are committed to the `dd` branch.
+* The following snippet shows how to update the local `dd` branch after a rebased version is pushed to the repository:
+
+```bash
+# Switches to the dd branch
+git checkout dd
+
+# Fetches the latest change.
+#   Better not use 'git pull'.
+git fetch
+
+# Confirms that there are conflicting changes.
+git status
+
+# Makes the local dd branch identical to the remote one.
+#   Warning: this wipes out any local change.
+git reset --hard @{u}
+```
+
 ## TL;DR
 
 ```bash
@@ -8,6 +39,8 @@
 #   The new files are ignored by git.
 cp .env/db.common.env.template .env/db.common.env
 cp .env/db.env.template .env/db.env
+cp .env/datadog.env.template .env/datadog.env
+cp .env/datadog.rum.env.template .env/datadog.rum.env
 
 # Starts the production containers using either
 # docker-compose or podman-compose.
@@ -108,6 +141,7 @@ This project hosts several "modules":
 | [db](./db) | The [MySQL](https://www.mysql.com/) configuration for the database that is used by the "Ledger" section of the Node and Go LappDogs. |
 | [tests](./tests) | Provides "sanity tests" to help determine if the modules are working. |
 | [.env](./.env) | The files defining *all* environment variables used by this project. |
+| [datadog](./datadog) | Configuration for the Datadog Agent, which, as the other modules, runs as a container. |
 
 ## Environment Variables
 
@@ -129,6 +163,8 @@ Template files like [db.env.template](./.env/db.env.template) contain variables 
 | [dev.env](./.env/dev.env) | Environment variables for the development environment. |
 | [container.env](./.env/container.env) | Environment variables for the container environment. |
 | [local.env](./.env/local.env) | Environment variables that are not meant to be passed to modules (they only apply to the host). |
+| [datadog.env](./.env/datadog.env.template) | Environment variables for the datadog agent. |
+| [datadog.rum.env](./.env/datadog.rum.env.template) | Environment variables for modules that provide RUM information (like the viewer). |
 
 ## Tests
 

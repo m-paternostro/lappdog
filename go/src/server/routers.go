@@ -4,7 +4,7 @@ import (
   "net/http"
   "strings"
 
-  "github.com/gorilla/mux"
+  muxtrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/gorilla/mux"
 
   rt "lappdog/routes"
 )
@@ -18,8 +18,8 @@ type Route struct {
 
 type Routes []Route
 
-func NewRouter() *mux.Router {
-  router := mux.NewRouter().StrictSlash(true)
+func NewRouter() *muxtrace.Router {
+  router := muxtrace.NewRouter().StrictSlash(true)
   for _, route := range routes {
     var handler http.Handler
     handler = route.HandlerFunc
