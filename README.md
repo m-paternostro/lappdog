@@ -81,7 +81,7 @@ The project is developed mostly on Macs, using both Big Sur and Monterey. Less o
 * [Docker](https://www.docker.com/) or [Podman](https://podman.io/).
 * [Docker Compose](https://docs.docker.com/compose/) or [Podman Compose](https://github.com/containers/podman-compose)
   * Docker Compose is usually installed with Docker.
-  * Podman Compose can be installed from the source code or via package managers, like `sudo pacman -Ss podman-compose` on Arch Linux.
+  * Podman Compose can be installed from the source code or via package managers, like `sudo pacman -S podman-compose` on Arch Linux.
 * Bash to run the scripts.
   * Some of our shell scripts do look outdated. Unfortunately we cannot use newer constructs because Macs [are stuck with a fairly old version of Bash](https://www.quora.com/Why-does-Mac-OS-X-have-outdated-versions-of-Shell-and-Coreutils) - and, for now, we chose not to require the [Z shell](https://en.wikipedia.org/wiki/Z_shell).
 
