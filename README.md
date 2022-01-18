@@ -28,6 +28,8 @@ cp .env/db.env.template .env/db.env
 ./compose.sh down -v
 ```
 
+This is pretty much it. You only need to read the long text below if you really want to know what's going on behind the scenes ;-)
+
 ## Introduction
 
 The main goal of this project is to learn by experimenting with different technologies - focusing on identifying and adopting the best practices applicable to each.
