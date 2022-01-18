@@ -70,7 +70,7 @@ RUN npm run build-prod
 # ====
 # ====
 
-FROM golang:1.14 AS godependencies
+FROM golang:1.17 AS godependencies
 
 ARG udi=1000
 ARG gid=1000

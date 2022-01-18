@@ -9,88 +9,30 @@ import (
 )
 
 func GetLedgerSummary(w http.ResponseWriter, r *http.Request) {
-  bd, err := getLedgerDB()
+  summary, err := models.GetLedgerSummary();
   if err != nil {
     sendError(w, err)
-    return
+  } else {
+    sendJSON(w, summary, http.StatusOK)
   }
-
-  var summary models.LedgerSummary
-  row := bd.QueryRow("select count(*), IFNULL(sum(balance), 0) from users")
-  err = row.Scan(&summary.Users, &summary.Balance)
-  if err != nil {
-    sendError(w, err)
-    return
-  }
-
-  row = bd.QueryRow("select count(*) from transactions")
-  err = row.Scan(&summary.Transactions)
-  if err != nil {
-    sendError(w, err)
-    return
-  }
-
-  sendJSON(w, summary, http.StatusOK)
 }
 
 func GetLedgerUsers(w http.ResponseWriter, r *http.Request) {
-  bd, err := getLedgerDB()
+  users, err := models.GetLedgerUsers();
   if err != nil {
     sendError(w, err)
-    return
+  } else {
+    sendJSON(w, users, http.StatusOK)
   }
-
-  users := []models.LedgerUser{}
-  rows, err := bd.Query("select name, balance from users")
-  if err != nil {
-    sendError(w, err)
-    return
-  }
-  defer rows.Close()
-
-  for rows.Next() {
-    var user models.LedgerUser
-    err = rows.Scan(&user.Name, &user.Balance)
-    if err != nil {
-      sendError(w, err)
-      return
-    }
-
-    users = append(users, user)
-  }
-
-  sendJSON(w, users, http.StatusOK)
 }
 
 func GetLedgerTransactions(w http.ResponseWriter, r *http.Request) {
-  bd, err := getLedgerDB()
+  transactions, err := models.GetLedgerTransactions();
   if err != nil {
     sendError(w, err)
-    return
+  } else {
+    sendJSON(w, transactions, http.StatusOK)
   }
-
-  transactions := []models.LedgerTransaction{}
-  rows, err := bd.Query(`select u1.name, u2.name, t.amount
-  from transactions t, users u1, users u2
-  where u1.id = t.fromuser and u2.id = t.touser`)
-  if err != nil {
-    sendError(w, err)
-    return
-  }
-  defer rows.Close()
-
-  for rows.Next() {
-    var transaction models.LedgerTransaction
-    err = rows.Scan(&transaction.From, &transaction.To, &transaction.Amount)
-    if err != nil {
-      sendError(w, err)
-      return
-    }
-
-    transactions = append(transactions, transaction)
-  }
-
-  sendJSON(w, transactions, http.StatusOK)
 }
 
 func RegisterLedgerUser(w http.ResponseWriter, r *http.Request) {
@@ -107,13 +49,7 @@ func RegisterLedgerUser(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  bd, err := getLedgerDB()
-  if err != nil {
-    sendError(w, err)
-    return
-  }
-
-  _, err = bd.Exec("insert into users (name, balance) values (?, ?)", user.Name, user.Balance)
+  err = models.RegisterLedgerUser(user)
   if err != nil {
     sendError(w, err)
     return
@@ -136,13 +72,7 @@ func RecordLedgerTransaction(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  bd, err := getLedgerDB()
-  if err != nil {
-    sendError(w, err)
-    return
-  }
-
-  _, err = bd.Exec("select registerTransaction(?, ?, ?)", transaction.From, transaction.To, transaction.Amount)
+  err = models.RecordLedgerTransaction(transaction)
   if err != nil {
     sendError(w, err)
     return
