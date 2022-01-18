@@ -28,13 +28,15 @@ cp .env/db.env.template .env/db.env
 ./compose.sh down -v
 ```
 
-This is pretty much it. You only need to read the long text below if you really want to know what's going on behind the scenes ;-)
+This is pretty much it... Before stopping the containers, you had a viewer exposing identical applications, each implemented using a completely different technology.
+
+If you liked it, you can now read the (looong) text below for details and reasoning - or just delve into to the code to find out what's going on behind the scenes ;-)
 
 ## Introduction
 
-The main goal of this project is to learn by experimenting with different technologies - focusing on identifying and adopting the best practices applicable to each.
+Our main goal with this project is to provide a structured way to experiment with different technologies, always focusing on identifying and (hopefully) adopting the best practices applicable to each.
 
-We quickly noticed that, to accomplish this (ambitious) goal, the project can be neither too simple nor too complex. Alas, achieving this fine balance is not easy. Moreover, deeming something as "simple" or "complex" is certainly a matter of personal experience and preference. Hopefully we will get it right more often than not.
+We quickly noticed that, to accomplish this goal, the project can be neither too simple nor too complex. Alas, achieving this fine balance is not easy. Moreover, deeming something as "simple" or "complex" is certainly a matter of personal experience and preference. Hopefully we will get it right more often than not.
 
 After a great deal of reflection, we chose a design based on "LappDogs":
 
@@ -65,6 +67,7 @@ As such, we decided to abide to the following rules:
 * For each technology, we should aim to address real problems:
   * As an example, we invested some time designing how the node containers deal with the `node_modules` directory, to allow for both "local" and "containerized" development.
 * All configuration must be done via environment variables defined on "env" files.
+  * The value of an environment variable can only be written in one file - no copy and paste, no cheating ;-)
 
 ## Disclaimers
 
