@@ -4,8 +4,9 @@ import (
   "fmt"
   "os"
 
+  sqltrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/database/sql"
   "database/sql"
-  _ "github.com/go-sql-driver/mysql"
+  "github.com/go-sql-driver/mysql"
 )
 
 var connectionString string
@@ -25,7 +26,9 @@ func getLedgerDB() (*sql.DB, error) {
       port,
     )
   }
-  return sql.Open("mysql", connectionString + "/ledger")
+
+  sqltrace.Register("mysql", &mysql.MySQLDriver{}, sqltrace.WithServiceName(os.Getenv("LAPPDOG_SERVICE_MYSQL")))
+  return sqltrace.Open("mysql", connectionString + "/ledger")
 }
 
 func GetLedgerSummary() (*LedgerSummary, error) {
