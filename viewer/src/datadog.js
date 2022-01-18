@@ -4,7 +4,7 @@ import { fetchEnvironmentVariables } from './common/util.js';
 
 export default async () => {
   const variableMap = await fetchEnvironmentVariables(
-    'LAPPDOG_DD_DISABLED',
+    'LAPPDOG_DEV',
     'DD_SITE',
     'DD_APP_ID',
     'DD_CLIENT_TOKEN',
@@ -16,7 +16,7 @@ export default async () => {
     throw new Error('Environment variables not found: not able to start Datadog RUM.');
   }
 
-  if (variableMap.LAPPDOG_DD_DISABLED !== 'true') {
+  if (variableMap.LAPPDOG_DEV !== 'true') {
     const requiredValue = (name) => {
       const value = variableMap[name];
       if (!value) {

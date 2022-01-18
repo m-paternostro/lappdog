@@ -9,7 +9,7 @@ import (
 )
 
 func DatadogStart() ([]string, error) {
-  if os.Getenv("LAPPDOG_DD_DISABLED") != "true" {
+  if os.Getenv("LAPPDOG_DEV") != "true" {
     tracer.Start(tracer.WithRuntimeMetrics())
 
     err := profiler.Start(

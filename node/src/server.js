@@ -3,7 +3,6 @@
 import createDebug from 'debug';
 import http from 'http';
 
-import './datadog.js';
 import app, { disposeApp } from './app.js';
 import { toNumber } from './common/util.js';
 
